@@ -1,0 +1,20 @@
+{
+  "name": "barbacue-diaries",
+  "version": "0.1.0",
+  "description": "Desktop diary for BBQ experiments",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [
+    "bbq",
+    "desktop",
+    "diary",
+    "electron"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^31.0.2"
+  }
+}

@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Barbacue Diaries</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <h1>Barbacue Diaries</h1>
+      <p>Log your cook. Learn what works. Repeat your best fire sessions.</p>
+    </header>
+
+    <main class="layout">
+      <section class="card tabs-card">
+        <div class="tabs" role="tablist" aria-label="Barbacue views">
+          <button class="tab-button active" type="button" role="tab" aria-selected="true" aria-controls="archive-panel" id="archive-tab" data-tab="archive-panel">Archive</button>
+          <button class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="new-entry-panel" id="new-entry-tab" data-tab="new-entry-panel">New Entry</button>
+        </div>
+
+        <section id="archive-panel" class="tab-panel" role="tabpanel" aria-labelledby="archive-tab">
+          <form id="filters-form" class="filters">
+            <input name="meat" type="text" placeholder="Meat" />
+
+            <select name="cookerType">
+              <option value="">Any cooker</option>
+              <option value="parrilla">Parrilla</option>
+              <option value="kamado">Kamado</option>
+            </select>
+
+            <select name="smoked">
+              <option value="">Smoked: any</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+
+            <div class="actions">
+              <button type="submit">Search</button>
+            </div>
+          </form>
+        </section>
+
+        <section id="new-entry-panel" class="tab-panel hidden" role="tabpanel" aria-labelledby="new-entry-tab">
+          <form id="entry-form" class="grid-form">
+            <label>
+              Meat
+              <input name="meat" type="text" maxlength="60" required />
+            </label>
+
+            <label>
+              Cooker
+              <select name="cookerType" required>
+                <option value="">Select</option>
+                <option value="parrilla">Parrilla</option>
+                <option value="kamado" selected>Kamado</option>
+              </select>
+            </label>
+
+            <label>
+              Cook Time Anverse (min)
+              <input name="cookTimeAnverseMinutes" type="number" min="1" step="1" required />
+            </label>
+
+            <label>
+              Cook Time Reverse (min)
+              <input name="cookTimeReverseMinutes" type="number" min="1" step="1" required />
+            </label>
+
+            <label>
+              Temperature
+              <input name="temperature" type="number" step="1" required />
+            </label>
+
+            <label>
+              Smoked
+              <select name="smoked" required>
+                <option value="">Select</option>
+                <option value="yes">Yes</option>
+                <option value="no" selected>No</option>
+              </select>
+            </label>
+
+            <label>
+              Wood
+              <input name="wood" type="text" maxlength="50" required value="Encina" />
+            </label>
+
+            <label class="full-width">
+              Final Result
+              <fieldset class="star-rating" aria-label="Final result rating">
+                <input id="rating-5" type="radio" name="resultStars" value="5" required />
+                <label for="rating-5" title="5 stars"></label>
+                <input id="rating-4" type="radio" name="resultStars" value="4" />
+                <label for="rating-4" title="4 stars"></label>
+                <input id="rating-3" type="radio" name="resultStars" value="3" />
+                <label for="rating-3" title="3 stars"></label>
+                <input id="rating-2" type="radio" name="resultStars" value="2" />
+                <label for="rating-2" title="2 stars"></label>
+                <input id="rating-1" type="radio" name="resultStars" value="1" />
+                <label for="rating-1" title="1 star"></label>
+              </fieldset>
+            </label>
+
+            <label class="full-width">
+              Tips
+              <textarea name="tips" rows="3" maxlength="280" placeholder="Optional notes for next time"></textarea>
+            </label>
+
+            <button type="submit">Save Entry</button>
+            <p id="entry-feedback" class="feedback" aria-live="polite"></p>
+          </form>
+        </section>
+      </section>
+
+      <section class="card entries-card">
+        <h2>Entries</h2>
+        <ul id="entries-list" class="entries-list"></ul>
+      </section>
+    </main>
+
+    <div id="detail-modal" class="detail-modal hidden" role="dialog" aria-modal="true" aria-labelledby="detail-title">
+      <div class="detail-modal-shell">
+        <div class="detail-modal-header">
+          <h2 id="detail-title">Entry Detail</h2>
+          <button id="close-detail-modal" type="button" class="secondary">Close</button>
+        </div>
+        <div id="entry-detail" class="entry-detail empty">
+          Select an entry to inspect details.
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
