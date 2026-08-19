@@ -4,7 +4,8 @@
   "description": "Desktop diary for BBQ experiments",
   "main": "src/main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "mobile": "node mobile/server.js"
   },
   "keywords": [
     "bbq",
@@ -16,5 +17,8 @@
   "license": "MIT",
   "devDependencies": {
     "electron": "^31.0.2"
+  },
+  "allowScripts": {
+    "electron@31.7.7": true
   }
 }

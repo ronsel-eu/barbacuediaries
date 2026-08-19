@@ -1,0 +1,10 @@
+{
+  "name": "Barbacue Diaries",
+  "short_name": "Barbacue",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f4efe6",
+  "theme_color": "#14251f",
+  "description": "A private BBQ cook journal.",
+  "icons": []
+}
