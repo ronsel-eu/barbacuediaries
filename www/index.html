@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#14251f" />
+    <meta name="description" content="A private BBQ cook journal for your phone." />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>Barbacue Diaries</title>
+  </head>
+  <body>
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">Private cook log</p>
+        <h1>Barbacue Diaries</h1>
+      </div>
+      <span class="status-dot" aria-label="Saved on this phone"></span>
+    </header>
+
+    <main>
+      <section id="archive-view" class="view active" aria-labelledby="archive-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Your fire history</p>
+            <h2 id="archive-title">Archive</h2>
+          </div>
+          <span id="entry-count" class="count-badge">0 cooks</span>
+        </div>
+
+        <form id="filters-form" class="search-bar">
+          <label class="search-input">
+            <span class="sr-only">Search entries</span>
+            <input name="query" type="search" placeholder="Search meat or wood" autocomplete="off" />
+          </label>
+          <select name="cookerType" aria-label="Filter by cooker">
+            <option value="">All cookers</option>
+            <option value="parrilla">Parrilla</option>
+            <option value="kamado">Kamado</option>
+          </select>
+        </form>
+
+        <ul id="entries-list" class="entries-list"></ul>
+        <div id="empty-state" class="empty-state hidden">
+          <span class="empty-mark">+</span>
+          <h3>No cooks yet</h3>
+          <p>Capture the next fire while the details are still fresh.</p>
+          <button id="empty-add-button" type="button" class="primary-button">Add first cook</button>
+        </div>
+      </section>
+
+      <section id="new-view" class="view" aria-labelledby="new-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Write it down</p>
+            <h2 id="new-title">New cook</h2>
+          </div>
+        </div>
+        <form id="entry-form" class="entry-form">
+          <label>Meat <input name="meat" type="text" maxlength="60" placeholder="e.g. Picanha" required /></label>
+          <label>Cooker <select name="cookerType" required><option value="">Choose one</option><option value="parrilla">Parrilla</option><option value="kamado">Kamado</option></select></label>
+          <div class="form-row">
+            <label>Anverse minutes <input name="cookTimeAnverseMinutes" type="number" min="1" step="1" required /></label>
+            <label>Reverse minutes <input name="cookTimeReverseMinutes" type="number" min="1" step="1" required /></label>
+          </div>
+          <div class="form-row">
+            <label>Temperature <input name="temperature" type="number" step="1" placeholder="C or F" required /></label>
+            <label>Smoked <select name="smoked" required><option value="no">No</option><option value="yes">Yes</option></select></label>
+          </div>
+          <label>Wood <input name="wood" type="text" maxlength="50" placeholder="e.g. Encina" required /></label>
+          <fieldset>
+            <legend>Final result</legend>
+            <div class="star-rating" aria-label="Final result rating">
+              <input id="rating-1" type="radio" name="resultStars" value="1" required /><label for="rating-1" title="1 star">1</label>
+              <input id="rating-2" type="radio" name="resultStars" value="2" /><label for="rating-2" title="2 stars">2</label>
+              <input id="rating-3" type="radio" name="resultStars" value="3" /><label for="rating-3" title="3 stars">3</label>
+              <input id="rating-4" type="radio" name="resultStars" value="4" /><label for="rating-4" title="4 stars">4</label>
+              <input id="rating-5" type="radio" name="resultStars" value="5" /><label for="rating-5" title="5 stars">5</label>
+            </div>
+          </fieldset>
+          <label>Tips for next time <textarea name="tips" rows="4" maxlength="280" placeholder="What would you repeat or change?"></textarea></label>
+          <button type="submit" class="primary-button">Save cook</button>
+          <p id="form-feedback" class="form-feedback" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section id="settings-view" class="view" aria-labelledby="settings-title">
+        <div class="section-heading"><div><p class="eyebrow">On this phone</p><h2 id="settings-title">Settings</h2></div></div>
+        <div class="settings-panel">
+          <div><strong>Local storage</strong><p>Your entries stay in this browser on this phone. Nothing is uploaded.</p></div>
+          <button id="export-button" type="button" class="secondary-button">Export backup</button>
+          <label class="secondary-button file-button">Import backup<input id="import-input" type="file" accept="application/json" /></label>
+        </div>
+        <p id="settings-feedback" class="form-feedback" aria-live="polite"></p>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Main navigation">
+      <button class="nav-button active" data-view="archive-view" type="button"><span>Archive</span></button>
+      <button class="nav-button add-nav-button" data-view="new-view" type="button"><span>+</span><span>New cook</span></button>
+      <button class="nav-button" data-view="settings-view" type="button"><span>Settings</span></button>
+    </nav>
+
+    <div id="detail-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-sheet">
+        <div class="modal-heading"><div><p class="eyebrow">Cook detail</p><h2 id="modal-title"></h2></div><button id="close-modal" class="icon-button" type="button" aria-label="Close">x</button></div>
+        <div id="detail-content"></div>
+        <div class="modal-actions"><button id="edit-button" type="button" class="secondary-button">Edit</button><button id="delete-button" type="button" class="danger-button">Delete</button></div>
+      </div>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>

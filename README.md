@@ -43,6 +43,30 @@ The separate `mobile/` app is a browser-based progressive web app. It stores ent
 
 The mobile app includes JSON export/import under Settings so phone entries can be backed up or moved manually. Its storage is separate from the desktop app's local `entries.json` file.
 
+## Build an Android APK
+
+The mobile app can also be packaged as a standalone Android app with Capacitor. This wrapper is separate from Electron and stores its entries locally on the phone.
+
+Prerequisites:
+
+- Android Studio with the Android SDK and Platform Tools
+- A Java JDK supported by the installed Android Gradle Plugin
+- An Android phone with Developer options and USB debugging enabled, or an Android emulator
+
+Create/sync the Android project:
+
+```bash
+npm run android:sync
+```
+
+Open it in Android Studio:
+
+```bash
+npm run android:open
+```
+
+From Android Studio, choose **Build > Build App Bundle(s) / APK(s) > Build APK(s)**, or connect a device and run the app. After changing files under `mobile/`, run `npm run android:sync` again before rebuilding.
+
 ## Notes
 
 - Data is persisted to a local file named entries.json under Electron's userData directory.
