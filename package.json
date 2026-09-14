@@ -6,7 +6,7 @@
   "scripts": {
     "start": "electron .",
     "mobile": "node mobile/server.js",
-    "mobile:copy": "rm -rf www && mkdir -p www && cp mobile/index.html mobile/styles.css mobile/app.js mobile/manifest.webmanifest mobile/sw.js www/",
+    "mobile:copy": "rm -rf www && mkdir -p www/icons && cp mobile/index.html mobile/styles.css mobile/app.js mobile/manifest.webmanifest mobile/sw.js www/ && cp mobile/icons/*.png www/icons/",
     "android:sync": "npm run mobile:copy && cap sync android",
     "android:open": "npm run android:sync && cap open android",
     "android:run": "npm run android:sync && cap run android"
