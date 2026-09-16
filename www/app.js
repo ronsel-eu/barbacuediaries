@@ -99,6 +99,7 @@ const TRANSLATIONS = {
     "import.replaceAll": "Replace all",
     "import.cancel": "Cancel",
     "settings.feedbackExported": "Backup exported.",
+    "settings.feedbackExportFailed": "Couldn't share the backup file. Try again.",
     "settings.feedbackMergedKeepMine": "Merged. Kept your existing cooks where the file overlapped.",
     "settings.feedbackMergedUseFile": "Merged. Used the file's version where it overlapped.",
     "settings.feedbackReplaced": "{count} cooks imported (replaced everything on this phone).",
@@ -207,6 +208,7 @@ const TRANSLATIONS = {
     "import.replaceAll": "Reemplazar todo",
     "import.cancel": "Cancelar",
     "settings.feedbackExported": "Copia exportada.",
+    "settings.feedbackExportFailed": "No se pudo compartir la copia de seguridad. Intenta de nuevo.",
     "settings.feedbackMergedKeepMine": "Combinado. Se mantuvieron tus asados donde el archivo coincidía.",
     "settings.feedbackMergedUseFile": "Combinado. Se usó la versión del archivo donde coincidía.",
     "settings.feedbackReplaced": "{count} asados importados (se reemplazó todo en este teléfono).",
@@ -878,15 +880,44 @@ document.getElementById("edit-button").addEventListener("click", () => {
   formFeedback.textContent = t("feedback.editing");
 });
 
-document.getElementById("export-button").addEventListener("click", () => {
+document.getElementById("export-button").addEventListener("click", async () => {
   const csv = entriesToCsv(loadEntries());
+  const fileName = `barbacue-diaries-${new Date().toISOString().slice(0, 10)}.csv`;
+  const feedback = document.getElementById("settings-feedback");
+  const isNative = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
+
+  if (isNative) {
+    // Plain <a download> blob links are silently ignored inside the Android app's
+    // WebView (there's no browser download manager to catch them), so on-device we
+    // write the CSV to the app's cache dir and hand it off via the native share
+    // sheet instead, letting the user save it to Files, Drive, email, etc.
+    try {
+      const { Filesystem, Share } = window.Capacitor.Plugins;
+      const written = await Filesystem.writeFile({
+        path: fileName,
+        data: csv,
+        directory: "CACHE",
+        encoding: "utf8",
+      });
+      await Share.share({
+        title: fileName,
+        dialogTitle: t("settings.exportButton"),
+        url: written.uri,
+      });
+      feedback.textContent = t("settings.feedbackExported");
+    } catch (err) {
+      feedback.textContent = t("settings.feedbackExportFailed");
+    }
+    return;
+  }
+
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
-  link.download = `barbacue-diaries-${new Date().toISOString().slice(0, 10)}.csv`;
+  link.download = fileName;
   link.click();
   URL.revokeObjectURL(link.href);
-  document.getElementById("settings-feedback").textContent = t("settings.feedbackExported");
+  feedback.textContent = t("settings.feedbackExported");
 });
 importInput.addEventListener("change", async (event) => {
   const file = event.target.files[0];
