@@ -1,10 +1,8 @@
 {
   "name": "barbacue-diaries",
   "version": "0.1.0",
-  "description": "Desktop diary for BBQ experiments",
-  "main": "src/main.js",
+  "description": "BBQ cook journal — mobile PWA + Android app",
   "scripts": {
-    "start": "electron .",
     "mobile": "node mobile/server.js",
     "mobile:copy": "rm -rf www && mkdir -p www/icons && cp mobile/index.html mobile/styles.css mobile/app.js mobile/manifest.webmanifest mobile/sw.js www/ && cp mobile/icons/*.png www/icons/",
     "android:sync": "npm run mobile:copy && cap sync android",
@@ -13,19 +11,16 @@
   },
   "keywords": [
     "bbq",
-    "desktop",
     "diary",
-    "electron"
+    "mobile",
+    "android",
+    "pwa"
   ],
   "author": "",
   "license": "MIT",
   "devDependencies": {
     "@capacitor/android": "^8.5.0",
     "@capacitor/cli": "^8.5.0",
-    "@capacitor/core": "^8.5.0",
-    "electron": "^31.0.2"
-  },
-  "allowScripts": {
-    "electron@31.7.7": true
+    "@capacitor/core": "^8.5.0"
   }
 }

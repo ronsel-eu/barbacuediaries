@@ -1,51 +1,38 @@
-# Barbacue Diaries (Desktop MVP)
+# Barbacue Diaries
 
-Single-user desktop app to log BBQ experiments and search past entries.
+Single-user BBQ cook journal, built as a mobile-first progressive web app (installable to your phone's home screen) and packagable as a native Android app via Capacitor.
 
-## Implemented MVP Slice
+## Implemented features
 
-- Create entry with minimal fields:
-  - meat
-  - cooker type (parrilla or kamado)
-  - cook time in minutes
-  - temperature
-  - smoked (yes/no)
-  - wood
-  - final result
-- Archive list of all entries (newest first)
-- Search and filter by multiple fields
+- Create entry: meat, cooker type (configurable list in Settings), cook time, temperature (degrees or hand-test level), smoked (yes/no), wood, recipe, tips, result rating
+- Archive list of all entries (newest first), with search and filter
 - Entry detail view
-- Local file persistence (no external database)
+- English/Spanish UI language toggle
+- °C/°F setting
+- CSV export/import for backup, with merge-or-replace and duplicate detection
+- Offline-capable (service worker), installable to the home screen
+- Local storage only — no account, no external service
 
 ## Stack
 
-- Electron (desktop shell)
-- Vanilla HTML/CSS/JS for renderer UI
-- Local JSON storage in Electron userData path
+- Vanilla HTML/CSS/JS, zero dependencies in the app itself
+- Browser `localStorage` for entries and settings
+- Capacitor wraps the same code into a native Android APK
 
-## Run
+## Run the mobile app for phone testing
 
 1. Install Node.js (which includes npm)
 2. Install dependencies:
    npm install
-3. Start app:
-   npm start
-
-## Android phone version
-
-The separate `mobile/` app is a browser-based progressive web app. It stores entries locally in the phone browser, works offline after the first load, and does not change the Electron desktop app.
-
-1. Connect the Mac and Android phone to the same Wi-Fi network.
-2. Start the mobile server from this project:
+3. Connect your Mac and phone to the same Wi-Fi network
+4. Start the mobile server:
    npm run mobile
-3. Open the printed `Android phone` URL on the phone.
-4. Use the browser menu to add Barbacue Diaries to the home screen.
+5. Open the printed URL on the phone
+6. Use the browser menu to add Barbacue Diaries to the home screen
 
-The mobile app includes JSON export/import under Settings so phone entries can be backed up or moved manually. Its storage is separate from the desktop app's local `entries.json` file.
+The mobile app includes CSV export/import under Settings so entries can be backed up or moved manually.
 
 ## Build an Android APK
-
-The mobile app can also be packaged as a standalone Android app with Capacitor. This wrapper is separate from Electron and stores its entries locally on the phone.
 
 Prerequisites:
 
@@ -69,5 +56,5 @@ From Android Studio, choose **Build > Build App Bundle(s) / APK(s) > Build APK(s
 
 ## Notes
 
-- Data is persisted to a local file named entries.json under Electron's userData directory.
+- Entries and settings are stored locally on the device; nothing leaves the phone.
 - No authentication, sharing, media uploads, AI integration, or external service integrations are included.
