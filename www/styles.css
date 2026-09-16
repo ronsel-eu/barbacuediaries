@@ -105,7 +105,6 @@ h3 { margin-bottom: 0.35rem; font-weight: 700; }
 .bottom-nav { position: fixed; right: 0; bottom: 0; left: 0; z-index: 10; display: flex; justify-content: center; gap: 0.35rem; padding: 0.7rem 1rem calc(0.7rem + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(18px); }
 .nav-button { min-width: 6rem; border: 0; border-radius: 0.5rem; padding: 0.55rem 0.7rem; background: transparent; color: var(--muted); font-size: 0.72rem; font-weight: 700; }
 .nav-button.active { background: var(--vlau-dark); color: white; }
-.add-nav-button span:first-child { display: block; font-size: 1.2rem; line-height: 0.8; }
 .modal { position: fixed; inset: 0; z-index: 20; display: grid; align-items: end; background: rgba(10, 11, 11, 0.5); }
 .modal-sheet { max-height: 88vh; overflow: auto; padding: 1.25rem 1rem calc(1.5rem + env(safe-area-inset-bottom)); border-radius: 1rem 1rem 0 0; background: var(--surface); animation: sheet-up 240ms ease-out; }
 @keyframes sheet-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
