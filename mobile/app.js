@@ -880,10 +880,22 @@ document.getElementById("edit-button").addEventListener("click", () => {
   formFeedback.textContent = t("feedback.editing");
 });
 
+let snackbarTimeoutId;
+function showSnackbar(message) {
+  const el = document.getElementById("settings-feedback");
+  el.textContent = message;
+  el.classList.add("visible");
+  clearTimeout(snackbarTimeoutId);
+  snackbarTimeoutId = setTimeout(() => el.classList.remove("visible"), 2600);
+}
+function hideSnackbar() {
+  clearTimeout(snackbarTimeoutId);
+  document.getElementById("settings-feedback").classList.remove("visible");
+}
+
 document.getElementById("export-button").addEventListener("click", async () => {
   const csv = entriesToCsv(loadEntries());
   const fileName = `barbacue-diaries-${new Date().toISOString().slice(0, 10)}.csv`;
-  const feedback = document.getElementById("settings-feedback");
   const isNative = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
 
   if (isNative) {
@@ -904,9 +916,9 @@ document.getElementById("export-button").addEventListener("click", async () => {
         dialogTitle: t("settings.exportButton"),
         url: written.uri,
       });
-      feedback.textContent = t("settings.feedbackExported");
+      showSnackbar(t("settings.feedbackExported"));
     } catch (err) {
-      feedback.textContent = t("settings.feedbackExportFailed");
+      showSnackbar(t("settings.feedbackExportFailed"));
     }
     return;
   }
@@ -917,7 +929,7 @@ document.getElementById("export-button").addEventListener("click", async () => {
   link.download = fileName;
   link.click();
   URL.revokeObjectURL(link.href);
-  feedback.textContent = t("settings.feedbackExported");
+  showSnackbar(t("settings.feedbackExported"));
 });
 importInput.addEventListener("change", async (event) => {
   const file = event.target.files[0];
@@ -926,7 +938,7 @@ importInput.addEventListener("change", async (event) => {
     const imported = csvToEntries(await file.text());
 
     if (!imported.length) {
-      document.getElementById("settings-feedback").textContent = t("import.noEntries");
+      showSnackbar(t("import.noEntries"));
       importInput.value = "";
       return;
     }
@@ -941,9 +953,9 @@ importInput.addEventListener("change", async (event) => {
     importMergeUseFileButton.classList.toggle("hidden", duplicateCount === 0);
     importMergeKeepMineButton.textContent = duplicateCount > 0 ? t("import.mergeKeepMine") : t("import.merge");
     importReview.classList.remove("hidden");
-    document.getElementById("settings-feedback").textContent = "";
+    hideSnackbar();
   } catch (_error) {
-    document.getElementById("settings-feedback").textContent = t("import.couldNotRead");
+    showSnackbar(t("import.couldNotRead"));
     importInput.value = "";
   }
 });
@@ -952,7 +964,7 @@ importMergeKeepMineButton.addEventListener("click", () => {
   if (!pendingImportEntries) return;
   saveEntries(mergeEntries(loadEntries(), pendingImportEntries, "keep-mine"));
   renderEntries();
-  document.getElementById("settings-feedback").textContent = t("settings.feedbackMergedKeepMine");
+  showSnackbar(t("settings.feedbackMergedKeepMine"));
   resetImportReview();
 });
 
@@ -960,7 +972,7 @@ importMergeUseFileButton.addEventListener("click", () => {
   if (!pendingImportEntries) return;
   saveEntries(mergeEntries(loadEntries(), pendingImportEntries, "use-file"));
   renderEntries();
-  document.getElementById("settings-feedback").textContent = t("settings.feedbackMergedUseFile");
+  showSnackbar(t("settings.feedbackMergedUseFile"));
   resetImportReview();
 });
 
@@ -968,13 +980,13 @@ importReplaceAllButton.addEventListener("click", () => {
   if (!pendingImportEntries) return;
   saveEntries(pendingImportEntries);
   renderEntries();
-  document.getElementById("settings-feedback").textContent = tf("settings.feedbackReplaced", { count: pendingImportEntries.length });
+  showSnackbar(tf("settings.feedbackReplaced", { count: pendingImportEntries.length }));
   resetImportReview();
 });
 
 importCancelButton.addEventListener("click", () => {
   resetImportReview();
-  document.getElementById("settings-feedback").textContent = t("settings.feedbackImportCancelled");
+  showSnackbar(t("settings.feedbackImportCancelled"));
 });
 
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
