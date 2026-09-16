@@ -8,21 +8,14 @@ A private BBQ cook journal. Log a cook (meat, cooker, cook time, temperature, sm
 
 ## Where the design lives
 
-Three surfaces, three separate stylesheets — there's no shared design-system file yet:
+Two surfaces, one stylesheet — there's no shared design-system file, but there's also no longer a second one to keep in sync with (the Electron desktop app was removed 2026-09-16):
 
 | Surface | Files | Notes |
 |---|---|---|
-| Desktop (Electron) | `src/renderer/index.html`, `src/renderer/styles.css` | Three-column card layout, no bottom nav |
 | Mobile (PWA) | `mobile/index.html`, `mobile/styles.css` | Single column, bottom nav, bottom-sheet modals |
 | Android (Capacitor) | `www/` | A synced *copy* of `mobile/` — never edit `www/` directly, it gets overwritten by `npm run mobile:copy` |
 
 ## Current visual language
-
-**Desktop** (`src/renderer/styles.css`):
-- Colors: `--bg:#f4efe6` `--surface:#fff9f0` `--ink:#1e1e1e` `--muted:#5c554d` `--brand:#b54225` `--brand-dark:#8f3019` `--line:#d7cdbf`
-- Body font: "Avenir Next", "Segoe UI", sans-serif. No serif anywhere — headings just scale up the body font.
-- Radius scale: 10px (inputs/buttons) → 16px (cards/modal)
-- Background: a soft radial gradient from peach into the base cream
 
 **Mobile** (`mobile/styles.css`):
 - Colors: `--ink:#17231f` `--muted:#6e766f` `--paper:#f7f3eb` `--surface:#fffdf8` `--line:#dedbd1` `--pine:#14251f` `--ember:#d45e36` `--ember-dark:#a94327` `--sage:#c8d4c2` `--danger:#a33b31`
@@ -31,26 +24,22 @@ Three surfaces, three separate stylesheets — there's no shared design-system f
 - Background: a diagonal gradient, sage-green into cream into warm peach
 - Bottom nav is fixed on mobile widths, becomes a static bar above 700px
 
-**They're not the same palette.** Both are warm/terracotta-on-cream, but desktop's ember is `#b54225`, mobile's is `#d45e36`, and mobile has a pine-green + sage accent pair that desktop doesn't use at all. Nobody's unified these on purpose — it happened because the two were built at different times.
-
 ## Component inventory
 
-- **Entry list item** — desktop: bordered list row, plain text meta line. Mobile: card with shadow, meat name in serif, a `·`-separated meta line (cooker · time · temp · wood), a rating in the corner, optional tip preview.
-- **Star rating** — 5 radio inputs styled as stars, reverse-DOM-order + `flex-direction: row-reverse` CSS trick so N stars fill cumulatively. Desktop already had this right; mobile's version was fixed this session (previously only the single selected star lit up).
-- **Segmented toggle** (`mobile/styles.css` `.segmented`/`.mode-button`) — used for temperature mode (Degrees/Hand test) and the °C/°F setting. Desktop has no equivalent component.
-- **Level-rating chips** (mobile only) — 2×2 grid of hand-test heat levels (High/Medium/Medium-low/Low), each showing a seconds hint.
-- **Modal** — desktop: centered dialog. Mobile: bottom sheet that slides up, rounded top corners only.
-- **Bottom nav** (mobile/Android only) — Archive / + New cook / Settings, fixed to viewport bottom with safe-area padding for the home indicator.
+- **Entry list item** — card with shadow, meat name in serif, a `·`-separated meta line (cooker · time · temp · wood), a rating in the corner, optional tip preview.
+- **Star rating** — 5 radio inputs styled as stars, reverse-DOM-order + `flex-direction: row-reverse` CSS trick so N stars fill cumulatively.
+- **Segmented toggle** (`mobile/styles.css` `.segmented`/`.mode-button`) — used for temperature mode (Degrees/Hand test) and the °C/°F setting.
+- **Level-rating chips** — 2×2 grid of hand-test heat levels (High/Medium/Medium-low/Low), each showing a seconds hint.
+- **Modal** — bottom sheet that slides up, rounded top corners only.
+- **Bottom nav** — Archive / + New cook / Settings, fixed to viewport bottom with safe-area padding for the home indicator.
 
 ## Known gaps
 
-- **No app icon.** `mobile/manifest.webmanifest` has `"icons": []` — the installed PWA/Android icon is whatever the OS falls back to.
-- **No dark mode.** Both stylesheets are a single fixed light palette; `prefers-color-scheme` isn't handled anywhere.
-- **Desktop is visually behind** — still missing a delete button, and its filter UI doesn't expose fields the backend already supports (see `app-analysis.md` in the project for the full list — that's a functionality gap, not a design one, but it means the desktop UI has dead space where those controls could go).
+- **No dark mode.** The stylesheet is a single fixed light palette; `prefers-color-scheme` isn't handled anywhere.
 
 ## Constraints for any new direction
 
-- **No build step, no bundler.** Both apps are plain HTML/CSS/JS loaded directly — no Sass, no PostCSS, no Tailwind. Whatever the design becomes, it has to be hand-written CSS (custom properties are fine and already used).
+- **No build step, no bundler.** The app is plain HTML/CSS/JS loaded directly — no Sass, no PostCSS, no Tailwind. Whatever the design becomes, it has to be hand-written CSS (custom properties are fine and already used).
 - **No reliable network for new dependencies.** Pulling in an icon font, a webfont from a CDN, or a component library isn't safe to assume will work in every environment this gets built/tested in — prefer system fonts, inline SVG, or CSS-drawn shapes over external assets.
 - **Mobile-first, single column.** The phone is the primary surface now; anything explored for mobile should work down to a small phone width first.
 - **Respect `env(safe-area-inset-bottom)`** on mobile — the bottom nav and modal sheets already account for the iPhone home indicator; a redesign shouldn't lose that.
@@ -104,7 +93,7 @@ Explore Univers, Helvetica, Frutiger — all real Aicher-era grotesque/humanist 
 
 **What's not working / change:**
 
-**Decisions (September 2026):** Helvetica Neue only for now (Univers/Frutiger stay mood reference unless licensed files turn up later); restrained palette with Vlau as the one accent; mobile/Android only this round, desktop untouched.
+**Decisions (September 2026):** Helvetica Neue only for now (Univers/Frutiger stay mood reference unless licensed files turn up later); restrained palette with Vlau as the one accent; mobile/Android only this round (the desktop app has since been removed entirely, 2026-09-16).
 
 ## Reference palette (sourced from the image, September 2026)
 
@@ -155,12 +144,11 @@ Idle vs. active state pattern, consistent across all rating/toggle controls now 
 
 **Verification:** every text/icon/background pair actually used in the final stylesheet was run through a WCAG contrast script (4.5:1 for real text, 3:1 for icons/large UI) — full pass, including the fix above. HTML/CSS syntax checked (balanced tags, balanced braces). Not yet phone-tested.
 
-**Not yet done:** phone-tested by David. Desktop's `src/renderer/styles.css` is untouched. Teal, Yellow, and Greige from the reference palette are recorded but unused — worth revisiting if a future need (e.g. a distinct "smoked" indicator, or a wood-tone touch somewhere) calls for a second accent.
+**Not yet done:** phone-tested by David. Teal, Yellow, and Greige from the reference palette are recorded but unused — worth revisiting if a future need (e.g. a distinct "smoked" indicator, or a wood-tone touch somewhere) calls for a second accent.
 
 **Open questions:**
 
 - Do you own licensed files for Univers and/or Frutiger, or should those two stay long-term "mood reference"?
-- Bring desktop in line with this palette, or leave it as-is for now?
 - Now that Vlau's real value is a cooler blue-grey (not the more violet tone the text research suggested), does the restrained direction still feel right once you've seen it on the phone — or does it read as too cool/technical for a personal cook journal?
 
 ## App icon / favicon (September 2026)
@@ -192,7 +180,7 @@ Added the pictogram inline into `mobile/index.html`'s header, beside the "Barbac
 
 Layout: `.brand` wraps the mark + the existing eyebrow/title block in a flex row, `.brand-mark` fixed at `2.6rem` square. Verified by rendering the actual `index.html`/`styles.css`/`app.js` in headless Chromium at a phone-width viewport (420px) before calling it done — looks balanced against the title at that size, doesn't overflow or wrap.
 
-Not touched: desktop's header (`src/renderer/index.html`) and the empty-state "+" — this pass was header-only, per David's choice of "beside the title" over the other placement options offered.
+Not touched: the empty-state "+" — this pass was header-only, per David's choice of "beside the title" over the other placement options offered.
 
 ### Follow-up: aligned to the title, not the eyebrow+title block (September 2026)
 
