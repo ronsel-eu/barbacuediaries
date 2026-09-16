@@ -114,6 +114,8 @@ const TRANSLATIONS = {
     "detail.cooker": "Cooker",
     "detail.result": "Result",
     "detail.time": "Time",
+    "detail.anverseTime": "Anverse",
+    "detail.reverseTime": "Reverse",
     "detail.temperature": "Temperature",
     "detail.smoked": "Smoked",
     "detail.wood": "Wood",
@@ -220,6 +222,8 @@ const TRANSLATIONS = {
     "detail.cooker": "Método",
     "detail.result": "Resultado",
     "detail.time": "Tiempo",
+    "detail.anverseTime": "Anverso (minutos)",
+    "detail.reverseTime": "Reverso (minutos)",
     "detail.temperature": "Temperatura",
     "detail.smoked": "Ahumado",
     "detail.wood": "Leña",
@@ -480,7 +484,7 @@ function openDetails(id) {
   if (!entry) return;
   selectedEntryId = id;
   modalTitle.textContent = entry.meat;
-  detailContent.innerHTML = `<div class="detail-grid"><div class="detail-item"><span>${t("detail.cooker")}</span>${escapeHtml(cookerTypeLabel(entry.cookerType))}</div><div class="detail-item"><span>${t("detail.result")}</span><strong class="entry-rating">${stars(entry.resultStars)}</strong></div><div class="detail-item"><span>${t("detail.time")}</span>${entry.totalCookTimeMinutes} min</div><div class="detail-item"><span>${t("detail.temperature")}</span>${escapeHtml(formatTemperature(entry, currentSettings.unit))}</div><div class="detail-item"><span>${t("detail.smoked")}</span>${escapeHtml(translateSmoked(entry.smoked))}</div><div class="detail-item"><span>${t("detail.wood")}</span>${escapeHtml(entry.wood)}</div></div>${entry.recipe ? `<div class="detail-tips"><strong>${t("detail.recipe")}</strong>${escapeHtml(entry.recipe)}</div>` : ""}${entry.tips ? `<div class="detail-tips"><strong>${t("detail.tips")}</strong>${escapeHtml(entry.tips)}</div>` : ""}`;
+  detailContent.innerHTML = `<div class="detail-grid"><div class="detail-item"><span>${t("detail.cooker")}</span>${escapeHtml(cookerTypeLabel(entry.cookerType))}</div><div class="detail-item"><span>${t("detail.result")}</span><strong class="entry-rating">${stars(entry.resultStars)}</strong></div><div class="detail-item"><span>${t("detail.anverseTime")}</span>${entry.cookTimeAnverseMinutes} min</div><div class="detail-item"><span>${t("detail.reverseTime")}</span>${entry.cookTimeReverseMinutes} min</div><div class="detail-item"><span>${t("detail.temperature")}</span>${escapeHtml(formatTemperature(entry, currentSettings.unit))}</div><div class="detail-item"><span>${t("detail.smoked")}</span>${escapeHtml(translateSmoked(entry.smoked))}</div><div class="detail-item"><span>${t("detail.wood")}</span>${escapeHtml(entry.wood)}</div></div>${entry.recipe ? `<div class="detail-tips"><strong>${t("detail.recipe")}</strong>${escapeHtml(entry.recipe)}</div>` : ""}${entry.tips ? `<div class="detail-tips"><strong>${t("detail.tips")}</strong>${escapeHtml(entry.tips)}</div>` : ""}`;
   detailModal.classList.remove("hidden");
 }
 
