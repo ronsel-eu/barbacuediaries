@@ -1,4 +1,4 @@
-const CACHE_NAME = "barbacue-mobile-v2";
+const CACHE_NAME = "rescoldo-mobile-v1";
 const APP_SHELL = ["./", "./index.html", "./styles.css", "./app.js", "./manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {

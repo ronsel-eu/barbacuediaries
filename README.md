@@ -1,4 +1,4 @@
-# Barbacue Diaries
+# Rescoldo
 
 Single-user BBQ cook journal, built as a mobile-first progressive web app (installable to your phone's home screen) and packagable as a native Android app via Capacitor.
 
@@ -28,7 +28,7 @@ Single-user BBQ cook journal, built as a mobile-first progressive web app (insta
 4. Start the mobile server:
    npm run mobile
 5. Open the printed URL on the phone
-6. Use the browser menu to add Barbacue Diaries to the home screen
+6. Use the browser menu to add Rescoldo to the home screen
 
 The mobile app includes CSV export/import under Settings so entries can be backed up or moved manually.
 

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Barbacue Diaries</string>
-    <string name="title_activity_main">Barbacue Diaries</string>
-    <string name="package_name">com.barbacuediaries.app</string>
-    <string name="custom_url_scheme">com.barbacuediaries.app</string>
+    <string name="app_name">Rescoldo</string>
+    <string name="title_activity_main">Rescoldo</string>
+    <string name="package_name">com.rescoldo.app</string>
+    <string name="custom_url_scheme">com.rescoldo.app</string>
 </resources>

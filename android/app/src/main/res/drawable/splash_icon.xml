@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Barbacue Diaries pictogram (bull head + crossed trinche/facon), used as the
+<!-- Rescoldo pictogram (bull head + crossed trinche/facon), used as the
      splash screen's windowSplashScreenAnimatedIcon. Vector, not raster, so it
      renders crisply regardless of the small container size Android's
      SplashScreen compat library actually draws it into.

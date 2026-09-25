@@ -1,4 +1,4 @@
-# Barbacue Diaries — Design Context
+# Rescoldo — Design Context
 
 A living brief: the top half is what's actually true about the app's design today (so nothing has to be rediscovered later); the bottom half is blank for your own direction, references, and priorities. Edit this file directly — nothing here is generated automatically, so it'll only stay accurate if it's kept up to date by hand.
 

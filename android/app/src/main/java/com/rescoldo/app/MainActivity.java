@@ -1,4 +1,4 @@
-package com.barbacuediaries.app;
+package com.rescoldo.app;
 
 import android.os.Bundle;
 import androidx.core.splashscreen.SplashScreen;

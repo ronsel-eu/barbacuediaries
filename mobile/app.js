@@ -895,7 +895,7 @@ function hideSnackbar() {
 
 document.getElementById("export-button").addEventListener("click", async () => {
   const csv = entriesToCsv(loadEntries());
-  const fileName = `barbacue-diaries-${new Date().toISOString().slice(0, 10)}.csv`;
+  const fileName = `rescoldo-${new Date().toISOString().slice(0, 10)}.csv`;
   const isNative = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
 
   if (isNative) {

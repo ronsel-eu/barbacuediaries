@@ -1,6 +1,6 @@
 {
-  "appId": "com.barbacuediaries.app",
-  "appName": "Barbacue Diaries",
+  "appId": "com.rescoldo.app",
+  "appName": "Rescoldo",
   "webDir": "www",
   "bundledWebRuntime": false,
   "server": {
