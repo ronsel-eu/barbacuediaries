@@ -1,6 +1,12 @@
 const STORAGE_KEY = "barbacue-diaries.mobile.entries.v1";
 const SETTINGS_KEY = "barbacue-diaries.mobile.settings.v1";
 
+// Reference temperatures (°C) for each hand-test heat level, for comparison
+// against a thermometer reading. Source: David's own reference, Escuela
+// Argentina de Parrilleros ("El Libro") — fitted specifically for an open
+// parrilla, not a generic/US-style hand test.
+const LEVEL_TEMPERATURES_C = { high: 220, medium: 180, "medium-low": 160, low: 140 };
+
 const COOKER_TYPES = [
   { value: "parrilla", label: "Parrilla argentina" },
   { value: "kamado", label: "Kamado" },
@@ -49,7 +55,7 @@ const TRANSLATIONS = {
     "level.medium": "Medium",
     "level.medium-low": "Medium-low",
     "level.low": "Low",
-    "form.levelCaption": "Seconds you can hold your hand above the fire.",
+    "form.levelCaption": "Seconds you can hold your hand above the fire, with an approximate temperature for comparison.",
     "form.smokedLabel": "Smoked",
     "form.smokedNo": "No",
     "form.smokedYes": "Yes",
@@ -158,7 +164,7 @@ const TRANSLATIONS = {
     "level.medium": "Medio",
     "level.medium-low": "Medio-bajo",
     "level.low": "Bajo",
-    "form.levelCaption": "Segundos que aguantas la mano sobre el fuego.",
+    "form.levelCaption": "Segundos que aguantas la mano sobre el fuego, con una temperatura aproximada para comparar.",
     "form.smokedLabel": "Ahumado",
     "form.smokedNo": "No",
     "form.smokedYes": "Sí",
@@ -378,6 +384,15 @@ function setTemperatureMode(mode, opts = {}) {
 
 function applyUnitSettingToForm() {
   tempUnitLabel.textContent = `°${currentSettings.unit}`;
+}
+
+function applyLevelTemps() {
+  Object.entries(LEVEL_TEMPERATURES_C).forEach(([level, celsius]) => {
+    const span = document.querySelector(`#level-${level} + label .level-temp`);
+    if (!span) return;
+    const converted = convertTemperature(celsius, "C", currentSettings.unit);
+    span.textContent = `${converted}°${currentSettings.unit}`;
+  });
 }
 
 function applyUnitButtons() {
@@ -796,6 +811,7 @@ document.querySelectorAll('.unit-toggle .mode-button[data-unit]').forEach((butto
     saveSettings(currentSettings);
     applyUnitButtons();
     applyUnitSettingToForm();
+    applyLevelTemps();
     renderEntries();
   });
 });
@@ -808,6 +824,7 @@ document.querySelectorAll('.language-toggle .mode-button[data-lang]').forEach((b
     applyLanguageButtons();
     applyStaticTranslations();
     applyUnitSettingToForm();
+    applyLevelTemps();
     renderEntries();
     if (!detailModal.classList.contains("hidden") && selectedEntryId) openDetails(selectedEntryId);
   });
@@ -996,5 +1013,6 @@ applyUnitButtons();
 applyUnitSettingToForm();
 applyLanguageButtons();
 applyCookerTypeCheckboxes();
+applyLevelTemps();
 applyStaticTranslations();
 renderEntries();

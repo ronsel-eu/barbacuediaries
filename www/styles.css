@@ -65,9 +65,11 @@ h3 { margin-bottom: 0.35rem; font-weight: 700; }
 .level-rating label { display: grid; gap: 0.15rem; padding: 0.6rem 0.5rem; border: 1px solid var(--line); border-radius: 0.5rem; background: var(--surface); text-align: center; cursor: pointer; touch-action: manipulation; }
 .level-name { color: var(--ink); font-size: 0.85rem; font-weight: 700; }
 .level-hint { color: var(--muted); font-size: 0.68rem; font-weight: 500; letter-spacing: 0; text-transform: none; }
+.level-temp { color: var(--muted); font-size: 0.68rem; font-weight: 500; letter-spacing: 0; text-transform: none; }
 .level-rating input:checked + label { background: var(--vlau-dark); border-color: var(--vlau-dark); }
 .level-rating input:checked + label .level-name { color: white; }
 .level-rating input:checked + label .level-hint { color: rgba(255, 255, 255, 0.85); }
+.level-rating input:checked + label .level-temp { color: rgba(255, 255, 255, 0.85); }
 .level-caption { margin: 0.35rem 0 0; color: var(--muted); font-size: 0.72rem; font-weight: 400; letter-spacing: 0; text-transform: none; }
 
 .star-rating { display: flex; flex-direction: row-reverse; justify-content: flex-end; gap: 0.2rem; }
@@ -99,6 +101,7 @@ h3 { margin-bottom: 0.35rem; font-weight: 700; }
   .level-rating label:hover { background: var(--vlau-dark); border-color: var(--vlau-dark); }
   .level-rating label:hover .level-name { color: white; }
   .level-rating label:hover .level-hint { color: rgba(255, 255, 255, 0.85); }
+  .level-rating label:hover .level-temp { color: rgba(255, 255, 255, 0.85); }
   .star-rating label:hover,
   .star-rating label:hover ~ label { background: var(--vlau-dark); color: white; }
   .cooker-type-options label:hover { background: var(--vlau-dark); border-color: var(--vlau-dark); color: white; }
