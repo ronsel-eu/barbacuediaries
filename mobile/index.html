@@ -136,8 +136,8 @@
               <input id="rating-1" type="radio" name="resultStars" value="1" required /><label for="rating-1" title="1 star" data-i18n-title="star.title1">1</label>
             </div>
           </fieldset>
-          <label><span data-i18n="form.recipeLabel">Recipe</span> <textarea name="recipe" rows="4" maxlength="600" placeholder="Ingredients or method you followed" data-i18n-placeholder="form.recipePlaceholder"></textarea></label>
-          <label><span data-i18n="form.tipsLabel">Tips for next time</span> <textarea name="tips" rows="4" maxlength="280" placeholder="What would you repeat or change?" data-i18n-placeholder="form.tipsPlaceholder"></textarea></label>
+          <label><span data-i18n="form.recipeLabel">Recipe</span> <textarea name="recipe" rows="4" maxlength="1800" placeholder="Ingredients or method you followed" data-i18n-placeholder="form.recipePlaceholder"></textarea></label>
+          <label><span data-i18n="form.tipsLabel">Tips for next time</span> <textarea name="tips" rows="4" maxlength="840" placeholder="What would you repeat or change?" data-i18n-placeholder="form.tipsPlaceholder"></textarea></label>
           <div class="save-bar"><button type="submit" class="primary-button" data-i18n="form.saveButton">Save cook</button></div>
         </form>
       </section>
@@ -196,7 +196,7 @@
 
     <div id="detail-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <div class="modal-sheet">
-        <div class="modal-top"><p class="eyebrow" data-i18n="modal.eyebrow">Cook detail</p><button id="close-modal" class="text-button" type="button" data-i18n="modal.close">Close</button></div>
+        <div class="modal-top"><button id="close-modal" class="text-button" type="button" data-i18n="modal.close">Close</button></div>
         <h2 id="modal-title"></h2>
         <div id="detail-content"></div>
         <div class="modal-actions"><button id="edit-button" type="button" class="secondary-button" data-i18n="modal.edit">Edit</button><button id="delete-button" type="button" class="danger-button" data-i18n="modal.delete">Delete</button></div>
