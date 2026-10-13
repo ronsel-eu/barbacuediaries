@@ -191,7 +191,7 @@ const TRANSLATIONS = {
     "archive.searchLabel": "Buscar",
     "archive.searchPlaceholder": "Carne o leña",
     "archive.filterAriaLabel": "Filtrar por método",
-    "archive.filterAll": "Todos",
+    "archive.filterAll": "Todos los tipos",
     "archive.emptyAddAria": "Añadir primer asado",
     "archive.emptyTitle": "Aún no hay asados",
     "archive.emptyBody": "Registra el próximo fuego mientras los detalles están frescos.",
@@ -478,6 +478,72 @@ function applyCookerTypeCheckboxes() {
 
 let filterInitialized = false;
 
+// --- Custom dropdown (replaces the phone's native picker) -------------
+function closeDropdowns(except) {
+  document.querySelectorAll(".dropdown").forEach((wrap) => {
+    if (wrap === except) return;
+    wrap.querySelector(".dropdown-menu").classList.add("hidden");
+    wrap.querySelector(".dropdown-button").setAttribute("aria-expanded", "false");
+  });
+}
+
+function refreshDropdown(select) {
+  const wrap = select.closest(".dropdown");
+  if (!wrap) return;
+  const button = wrap.querySelector(".dropdown-button");
+  const menu = wrap.querySelector(".dropdown-menu");
+  const selected = select.options[select.selectedIndex];
+  button.textContent = selected ? selected.textContent : "";
+  button.setAttribute("aria-label", select.getAttribute("aria-label") || "");
+  menu.innerHTML = Array.from(select.options).map((option) =>
+    `<li role="option" data-value="${escapeHtml(option.value)}" aria-selected="${option.value === select.value}">${escapeHtml(option.textContent)}</li>`
+  ).join("");
+}
+
+function enhanceSelect(select) {
+  if (!select.closest(".dropdown")) {
+    const wrap = document.createElement("div");
+    wrap.className = "dropdown";
+    select.parentNode.insertBefore(wrap, select);
+    wrap.appendChild(select);
+    select.classList.add("native-select");
+    select.tabIndex = -1;
+    select.setAttribute("aria-hidden", "true");
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "dropdown-button";
+    button.setAttribute("aria-haspopup", "listbox");
+    button.setAttribute("aria-expanded", "false");
+    const menu = document.createElement("ul");
+    menu.className = "dropdown-menu hidden";
+    menu.setAttribute("role", "listbox");
+    wrap.append(button, menu);
+    button.addEventListener("click", () => {
+      const opening = menu.classList.contains("hidden");
+      closeDropdowns(opening ? wrap : null);
+      menu.classList.toggle("hidden", !opening);
+      button.setAttribute("aria-expanded", String(opening));
+      if (opening) {
+        const room = window.innerHeight - button.getBoundingClientRect().bottom - 140;
+        wrap.classList.toggle("up", room < menu.offsetHeight);
+      }
+    });
+    menu.addEventListener("click", (event) => {
+      const item = event.target.closest("[data-value]");
+      if (!item) return;
+      select.value = item.dataset.value;
+      closeDropdowns(null);
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+      button.focus();
+    });
+    select.addEventListener("change", () => refreshDropdown(select));
+  }
+  refreshDropdown(select);
+}
+
+document.addEventListener("click", (event) => { if (!event.target.closest(".dropdown")) closeDropdowns(null); });
+document.addEventListener("keydown", (event) => { if (event.key === "Escape") closeDropdowns(null); });
+
 function syncCookerButtons() {
   const select = entryForm.elements.namedItem("cookerType");
   document.querySelectorAll("#cooker-buttons .mode-button").forEach((button) => {
@@ -506,7 +572,8 @@ function renderCookerOptions(extraFormValue) {
     formValues.map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(cookerTypeLabel(value))}</option>`).join("");
   cookerSelect.value = formValues.includes(previousFormValue) ? previousFormValue : "";
   if (useButtons && !cookerSelect.value) cookerSelect.value = formValues[0] || "";
-  cookerSelect.classList.toggle("hidden", useButtons);
+  enhanceSelect(cookerSelect);
+  cookerSelect.closest(".dropdown").classList.toggle("hidden", useButtons);
   cookerButtons.classList.toggle("hidden", !useButtons);
   cookerButtons.innerHTML = useButtons
     ? formValues.map((value) => `<button type="button" class="mode-button" data-cooker="${escapeHtml(value)}">${escapeHtml(cookerTypeLabel(value))}</button>`).join("")
@@ -519,13 +586,18 @@ function renderCookerOptions(extraFormValue) {
   const filterValues = sortCookerValues(new Set([...enabled, ...usedValues]));
   filterSelect.innerHTML = `<option value="">${escapeHtml(t("archive.filterAll"))}</option>` +
     filterValues.map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(cookerTypeLabel(value))}</option>`).join("");
-  const defaultFilter = sortCookerValues(enabled)[0] || "";
+  // Default: the enabled cooker with the most cooks (ties go alphabetical).
+  const counts = {};
+  loadEntries().forEach((entry) => { counts[entry.cookerType] = (counts[entry.cookerType] || 0) + 1; });
+  const sortedEnabled = sortCookerValues(enabled);
+  const defaultFilter = sortedEnabled.reduce((best, value) => ((counts[value] || 0) > (counts[best] || 0) ? value : best), sortedEnabled[0]) || "";
   if (!filterInitialized) {
     filterSelect.value = defaultFilter;
     filterInitialized = true;
   } else {
     filterSelect.value = previousFilterValue === "" || filterValues.includes(previousFilterValue) ? previousFilterValue : defaultFilter;
   }
+  enhanceSelect(filterSelect);
 }
 
 // --- Translation application ---------------------------------------------

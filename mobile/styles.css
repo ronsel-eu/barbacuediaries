@@ -221,3 +221,25 @@ legend { padding: 0; }
 .entry-form .level-rating .level-name { display: block; }
 .entry-form label.sr-only { position: absolute; }
 .primary-button, .secondary-button, .danger-button, .text-button { text-transform: lowercase; }
+
+/* Custom dropdown (replaces the system picker) */
+.dropdown { position: relative; margin-top: 6px; }
+.native-select { position: absolute; left: 0; bottom: 0; width: 1px; height: 1px; margin: 0; padding: 0; border: 0; opacity: 0; pointer-events: none; }
+.dropdown-button {
+  display: block; width: 100%; height: 44px; padding: 0 40px 0 12px; border: 1px solid var(--ink); background-color: transparent;
+  font-size: 15px; font-weight: 700; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0h10L5 6z' fill='%230a0b0b'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+}
+.dropdown-menu { position: absolute; left: 0; right: 0; top: 100%; z-index: 15; max-height: 60vh; margin: -1px 0 0; padding: 0; overflow-y: auto; list-style: none; border: 1px solid var(--ink); background: var(--paper); }
+.dropdown.up .dropdown-menu { top: auto; bottom: 100%; margin: 0 0 -1px; }
+.dropdown-menu li { min-height: 48px; padding: 12px; font-size: 15px; line-height: 24px; border-bottom: 1px solid var(--rule); cursor: pointer; }
+.dropdown-menu li:last-child { border-bottom: 0; }
+.dropdown-menu li[data-value=""] { border-bottom: 1px solid var(--ink); }
+.dropdown-menu li[aria-selected="true"] { background: var(--accent); color: #fff; font-weight: 700; }
+
+/* Single, clean focus state (no doubled borders) */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.dropdown-button:focus-visible { outline: none; border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+input[type="text"]:focus-visible, input[type="search"]:focus-visible, input[type="number"]:focus-visible { outline: none; border-bottom-color: var(--accent); box-shadow: 0 1px 0 0 var(--accent); }
+textarea:focus-visible { outline: none; border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
