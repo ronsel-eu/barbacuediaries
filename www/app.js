@@ -18,18 +18,49 @@ const COOKER_TYPES = [
 ];
 const DEFAULT_ENABLED_COOKER_TYPES = ["barbacoa-carbon"];
 
+// Seconds you can hold a hand over the fire for each heat level.
+const LEVEL_SECONDS = { high: "<5s", medium: "6–8s", "medium-low": "8–10s", low: ">10s" };
+
 function cookerTypeLabel(value) {
+  const key = `cooker.${value}`;
+  const translated = t(key);
+  if (translated !== key) return translated;
   const match = COOKER_TYPES.find((cooker) => cooker.value === value);
   return match ? match.label : value;
+}
+
+// Cooker values sorted alphabetically by their label in the current language.
+function sortCookerValues(values) {
+  return [...values].sort((a, b) => cookerTypeLabel(a).localeCompare(cookerTypeLabel(b), currentSettings.language));
 }
 
 const TRANSLATIONS = {
   en: {
     "header.eyebrow": "Private cook log",
+    "archive.colCook": "Cook",
+    "archive.colTime": "Time",
+    "archive.colResult": "Result",
+    "archive.noMatchTitle": "Nothing here",
+    "archive.noMatchBody": "No cooks for this search or cooker. Try all cookers.",
+    "import.title": "Import backup",
+    "import.statFile": "cooks in this file",
+    "import.statNew": "new",
+    "import.statExisting": "already in your archive",
+    "import.explainKeepMine": "Adds the new cooks. If a cook is in both, yours stays.",
+    "import.explainUseFile": "Adds the new cooks. If a cook is in both, the file's version wins.",
+    "import.explainReplace": "Deletes everything on this phone and uses only the file.",
+    "import.explainCancel": "Nothing changes.",
+    "cooker.parrilla": "Parrilla",
+    "cooker.kamado": "Kamado",
+    "cooker.barbacoa-carbon": "Charcoal BBQ",
+    "cooker.barbacoa-gas": "Gas BBQ",
+    "cooker.barbacoa-electrica": "Electric BBQ",
+    "cooker.barril-ahumador": "Smoker barrel",
+    "cooker.ahumador": "Smoker",
     "archive.eyebrow": "Your fire history",
     "archive.title": "Archive",
-    "archive.searchLabel": "Search entries",
-    "archive.searchPlaceholder": "Search meat or wood",
+    "archive.searchLabel": "Search",
+    "archive.searchPlaceholder": "Meat or wood",
     "archive.filterAriaLabel": "Filter by cooker",
     "archive.filterAll": "All cookers",
     "archive.emptyAddAria": "Add first cook",
@@ -135,10 +166,30 @@ const TRANSLATIONS = {
   },
   es: {
     "header.eyebrow": "Diario privado de asados",
+    "archive.colCook": "Asado",
+    "archive.colTime": "Tiempo",
+    "archive.colResult": "Resultado",
+    "archive.noMatchTitle": "Nada por aquí",
+    "archive.noMatchBody": "No hay asados para esta búsqueda o método. Prueba con todos.",
+    "import.title": "Importar copia",
+    "import.statFile": "asados en este archivo",
+    "import.statNew": "nuevos",
+    "import.statExisting": "ya en tu archivo",
+    "import.explainKeepMine": "Añade los asados nuevos. Si un asado está en ambos, se queda el tuyo.",
+    "import.explainUseFile": "Añade los asados nuevos. Si un asado está en ambos, gana el del archivo.",
+    "import.explainReplace": "Borra todo lo de este teléfono y usa solo el archivo.",
+    "import.explainCancel": "No cambia nada.",
+    "cooker.parrilla": "Parrilla argentina",
+    "cooker.kamado": "Kamado",
+    "cooker.barbacoa-carbon": "Barbacoa de carbón",
+    "cooker.barbacoa-gas": "Barbacoa de gas",
+    "cooker.barbacoa-electrica": "Barbacoa eléctrica",
+    "cooker.barril-ahumador": "Barril ahumador",
+    "cooker.ahumador": "Ahumador",
     "archive.eyebrow": "Tu historial de fuego",
     "archive.title": "Archivo",
-    "archive.searchLabel": "Buscar asados",
-    "archive.searchPlaceholder": "Buscar carne o leña",
+    "archive.searchLabel": "Buscar",
+    "archive.searchPlaceholder": "Carne o leña",
     "archive.filterAriaLabel": "Filtrar por método",
     "archive.filterAll": "Todos",
     "archive.emptyAddAria": "Añadir primer asado",
@@ -262,6 +313,7 @@ const filtersForm = document.getElementById("filters-form");
 const entriesList = document.getElementById("entries-list");
 const emptyState = document.getElementById("empty-state");
 const entryCount = document.getElementById("entry-count");
+const entriesHead = document.getElementById("entries-head");
 const formFeedback = document.getElementById("form-feedback");
 const detailModal = document.getElementById("detail-modal");
 const detailContent = document.getElementById("detail-content");
@@ -342,18 +394,26 @@ function getTemperatureMode(entry) {
   return "degrees";
 }
 
+// Compact form for archive rows: always degrees (hand-test levels show their reference temperature).
 function formatTemperature(entry, displayUnit) {
-  const mode = getTemperatureMode(entry);
-
-  if (mode === "level") {
-    return entry.temperatureLevel ? t(`level.${entry.temperatureLevel}`) : t("misc.na");
+  if (getTemperatureMode(entry) === "level") {
+    const celsius = LEVEL_TEMPERATURES_C[entry.temperatureLevel];
+    if (!Number.isFinite(celsius)) return t("misc.na");
+    return `${convertTemperature(celsius, "C", displayUnit)}°${displayUnit}`;
   }
-
   const rawValue = Number(entry.temperatureValue ?? entry.temperature);
   if (!Number.isFinite(rawValue)) return t("misc.na");
-  const rawUnit = entry.temperatureUnit || "C";
-  const converted = convertTemperature(rawValue, rawUnit, displayUnit);
+  const converted = convertTemperature(rawValue, entry.temperatureUnit || "C", displayUnit);
   return `${converted}°${displayUnit}`;
+}
+
+// Full form for the detail view: "High <5s · 260°C" for the hand test, "120°C" for degrees.
+function formatTemperatureLong(entry, displayUnit) {
+  if (getTemperatureMode(entry) === "level") {
+    if (!entry.temperatureLevel) return t("misc.na");
+    return `${t(`level.${entry.temperatureLevel}`)} ${LEVEL_SECONDS[entry.temperatureLevel] || ""} · ${formatTemperature(entry, displayUnit)}`.replace("  ", " ");
+  }
+  return formatTemperature(entry, displayUnit);
 }
 
 function setTemperatureMode(mode, opts = {}) {
@@ -388,10 +448,10 @@ function applyUnitSettingToForm() {
 
 function applyLevelTemps() {
   Object.entries(LEVEL_TEMPERATURES_C).forEach(([level, celsius]) => {
-    const span = document.querySelector(`#level-${level} + label .level-temp`);
-    if (!span) return;
-    const converted = convertTemperature(celsius, "C", currentSettings.unit);
-    span.textContent = `${converted}°${currentSettings.unit}`;
+    const temp = document.querySelector(`#level-${level} + label .level-temp`);
+    const hint = document.querySelector(`#level-${level} + label .level-hint`);
+    if (hint) hint.textContent = LEVEL_SECONDS[level] || "";
+    if (temp) temp.textContent = `${convertTemperature(celsius, "C", currentSettings.unit)}°${currentSettings.unit}`;
   });
 }
 
@@ -408,9 +468,27 @@ function applyLanguageButtons() {
 }
 
 function applyCookerTypeCheckboxes() {
-  COOKER_TYPES.forEach((cooker) => {
-    const checkbox = document.getElementById(`cooker-type-${cooker.value}`);
-    if (checkbox) checkbox.checked = currentSettings.enabledCookerTypes.includes(cooker.value);
+  const container = document.getElementById("cooker-type-options");
+  container.innerHTML = sortCookerValues(COOKER_TYPES.map((cooker) => cooker.value)).map((value) => `
+    <div class="cooker-type-option">
+      <input id="cooker-type-${escapeHtml(value)}" type="checkbox" name="enabledCookerTypes" value="${escapeHtml(value)}"${currentSettings.enabledCookerTypes.includes(value) ? " checked" : ""} />
+      <label for="cooker-type-${escapeHtml(value)}">${escapeHtml(cookerTypeLabel(value))}</label>
+    </div>`).join("");
+}
+
+let filterInitialized = false;
+
+function syncCookerButtons() {
+  const select = entryForm.elements.namedItem("cookerType");
+  document.querySelectorAll("#cooker-buttons .mode-button").forEach((button) => {
+    button.classList.toggle("active", button.dataset.cooker === select.value);
+  });
+}
+
+function syncSmokedButtons() {
+  const value = entryForm.elements.namedItem("smoked").value === "yes" ? "yes" : "no";
+  document.querySelectorAll(".smoked-toggle .mode-button").forEach((button) => {
+    button.classList.toggle("active", button.dataset.smoked === value);
   });
 }
 
@@ -418,21 +496,36 @@ function renderCookerOptions(extraFormValue) {
   const enabled = currentSettings.enabledCookerTypes;
   const usedValues = Array.from(new Set(loadEntries().map((entry) => entry.cookerType).filter(Boolean)));
 
+  // New-cook form: up to two cookers become buttons, more become a select.
   const cookerSelect = entryForm.elements.namedItem("cookerType");
+  const cookerButtons = document.getElementById("cooker-buttons");
   const previousFormValue = cookerSelect.value;
-  const keepForForm = new Set([...enabled, previousFormValue, extraFormValue].filter(Boolean));
-  const formTypes = COOKER_TYPES.filter((cooker) => keepForForm.has(cooker.value));
-  cookerSelect.innerHTML = `<option value="" data-i18n="form.cookerChoose">${t("form.cookerChoose")}</option>` +
-    formTypes.map((cooker) => `<option value="${escapeHtml(cooker.value)}">${escapeHtml(cooker.label)}</option>`).join("");
-  cookerSelect.value = previousFormValue;
+  const formValues = sortCookerValues(new Set([...enabled, previousFormValue, extraFormValue].filter(Boolean)));
+  const useButtons = formValues.length <= 2;
+  cookerSelect.innerHTML = `<option value="">${escapeHtml(t("form.cookerChoose"))}</option>` +
+    formValues.map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(cookerTypeLabel(value))}</option>`).join("");
+  cookerSelect.value = formValues.includes(previousFormValue) ? previousFormValue : "";
+  if (useButtons && !cookerSelect.value) cookerSelect.value = formValues[0] || "";
+  cookerSelect.classList.toggle("hidden", useButtons);
+  cookerButtons.classList.toggle("hidden", !useButtons);
+  cookerButtons.innerHTML = useButtons
+    ? formValues.map((value) => `<button type="button" class="mode-button" data-cooker="${escapeHtml(value)}">${escapeHtml(cookerTypeLabel(value))}</button>`).join("")
+    : "";
+  syncCookerButtons();
 
+  // Archive filter: "all cookers" plus the cookers in use; pre-filtered to the first enabled cooker.
   const filterSelect = filtersForm.elements.namedItem("cookerType");
   const previousFilterValue = filterSelect.value;
-  const keepForFilter = new Set([...enabled, ...usedValues]);
-  const filterTypes = COOKER_TYPES.filter((cooker) => keepForFilter.has(cooker.value));
-  filterSelect.innerHTML = `<option value="" data-i18n="archive.filterAll">${t("archive.filterAll")}</option>` +
-    filterTypes.map((cooker) => `<option value="${escapeHtml(cooker.value)}">${escapeHtml(cooker.label)}</option>`).join("");
-  filterSelect.value = previousFilterValue;
+  const filterValues = sortCookerValues(new Set([...enabled, ...usedValues]));
+  filterSelect.innerHTML = `<option value="">${escapeHtml(t("archive.filterAll"))}</option>` +
+    filterValues.map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(cookerTypeLabel(value))}</option>`).join("");
+  const defaultFilter = sortCookerValues(enabled)[0] || "";
+  if (!filterInitialized) {
+    filterSelect.value = defaultFilter;
+    filterInitialized = true;
+  } else {
+    filterSelect.value = previousFilterValue === "" || filterValues.includes(previousFilterValue) ? previousFilterValue : defaultFilter;
+  }
 }
 
 // --- Translation application ---------------------------------------------
@@ -455,9 +548,11 @@ function applyStaticTranslations() {
 
 // --- Rendering ----------------------------------------------------------
 
-function stars(value) {
-  const rating = Number(value);
-  return `${"★".repeat(rating)}${"☆".repeat(Math.max(0, 5 - rating))}`;
+// Result as five squares: filled up to the rating.
+function squares(value, large = false) {
+  const rating = Math.max(0, Math.min(5, Number(value) || 0));
+  const cells = Array.from({ length: 5 }, (_, index) => `<i class="${index < rating ? "on" : ""}"></i>`).join("");
+  return `<span class="squares${large ? " lg" : ""}" role="img" aria-label="${escapeHtml(tf("misc.starsAriaLabel", { stars: rating }))}">${cells}</span>`;
 }
 
 function escapeHtml(value) {
@@ -473,7 +568,7 @@ function getFilteredEntries() {
   const query = String(filters.query || "").trim().toLowerCase();
   return loadEntries()
     .filter((entry) => {
-      const searchable = `${entry.meat} ${entry.wood} ${entry.cookerType}`.toLowerCase();
+      const searchable = `${entry.meat} ${entry.wood} ${entry.cookerType} ${cookerTypeLabel(entry.cookerType)}`.toLowerCase();
       return (!query || searchable.includes(query)) && (!filters.cookerType || entry.cookerType === filters.cookerType);
     })
     .sort((first, second) => new Date(second.createdAt) - new Date(first.createdAt));
@@ -483,15 +578,23 @@ function renderEntries() {
   renderCookerOptions();
   const allEntries = loadEntries();
   const entries = getFilteredEntries();
-  entryCount.textContent = `${allEntries.length} ${t(allEntries.length === 1 ? "count.cook" : "count.cooks")}`;
+  const showCooker = !filtersForm.elements.namedItem("cookerType").value;
+  entryCount.textContent = `${entries.length} ${t(entries.length === 1 ? "count.cook" : "count.cooks")}`;
   entriesList.innerHTML = "";
-  emptyState.classList.toggle("hidden", entries.length > 0);
-  if (!entries.length) return;
+  const isEmpty = entries.length === 0;
+  const noMatches = isEmpty && allEntries.length > 0;
+  emptyState.classList.toggle("hidden", !isEmpty);
+  entriesHead.classList.toggle("hidden", isEmpty);
+  document.getElementById("empty-title").textContent = t(noMatches ? "archive.noMatchTitle" : "archive.emptyTitle");
+  document.getElementById("empty-body").textContent = t(noMatches ? "archive.noMatchBody" : "archive.emptyBody");
+  document.getElementById("empty-add-button").classList.toggle("hidden", noMatches);
+  if (isEmpty) return;
 
   for (const entry of entries) {
     const item = document.createElement("li");
     item.className = "entry-card";
-    item.innerHTML = `<button type="button" data-entry-id="${escapeHtml(entry.id)}"><span class="entry-name">${escapeHtml(entry.meat)}</span><span class="entry-meta">${escapeHtml(cookerTypeLabel(entry.cookerType))} · ${entry.totalCookTimeMinutes} min · ${escapeHtml(formatTemperature(entry, currentSettings.unit))} · ${escapeHtml(entry.wood)}</span>${entry.tips ? `<p class="entry-tip">${escapeHtml(entry.tips)}</p>` : ""}</button><span class="entry-rating" aria-label="${tf("misc.starsAriaLabel", { stars: entry.resultStars })}">${stars(entry.resultStars)}</span>`;
+    const meta = [showCooker ? cookerTypeLabel(entry.cookerType) : "", entry.wood, formatTemperature(entry, currentSettings.unit)].filter(Boolean).join(" · ");
+    item.innerHTML = `<button type="button" class="entry-row" data-entry-id="${escapeHtml(entry.id)}"><span><span class="entry-name">${escapeHtml(entry.meat)}</span><span class="entry-meta">${escapeHtml(meta)}</span></span><span class="entry-time">${escapeHtml(String(entry.totalCookTimeMinutes))} min</span>${squares(entry.resultStars)}</button>`;
     entriesList.appendChild(item);
   }
 }
@@ -501,7 +604,20 @@ function openDetails(id) {
   if (!entry) return;
   selectedEntryId = id;
   modalTitle.textContent = entry.meat;
-  detailContent.innerHTML = `<div class="detail-grid"><div class="detail-item"><span>${t("detail.cooker")}</span>${escapeHtml(cookerTypeLabel(entry.cookerType))}</div><div class="detail-item"><span>${t("detail.result")}</span><strong class="entry-rating">${stars(entry.resultStars)}</strong></div><div class="detail-item"><span>${t("detail.anverseTime")}</span>${entry.cookTimeAnverseMinutes} min</div><div class="detail-item"><span>${t("detail.reverseTime")}</span>${entry.cookTimeReverseMinutes} min</div><div class="detail-item"><span>${t("detail.temperature")}</span>${escapeHtml(formatTemperature(entry, currentSettings.unit))}</div><div class="detail-item"><span>${t("detail.smoked")}</span>${escapeHtml(translateSmoked(entry.smoked))}</div><div class="detail-item"><span>${t("detail.wood")}</span>${escapeHtml(entry.wood)}</div></div>${entry.recipe ? `<div class="detail-tips"><strong>${t("detail.recipe")}</strong>${escapeHtml(entry.recipe)}</div>` : ""}${entry.tips ? `<div class="detail-tips"><strong>${t("detail.tips")}</strong>${escapeHtml(entry.tips)}</div>` : ""}`;
+  const hasSplit = entry.cookTimeAnverseMinutes && entry.cookTimeReverseMinutes;
+  const time = hasSplit
+    ? `${entry.totalCookTimeMinutes} min (${entry.cookTimeAnverseMinutes} + ${entry.cookTimeReverseMinutes})`
+    : `${entry.totalCookTimeMinutes} min`;
+  const wood = [entry.wood, entry.smoked === "yes" ? t("detail.smoked").toLowerCase() : ""].filter(Boolean).join(" · ");
+  const fact = (label, value) => `<div><dt>${escapeHtml(label)}</dt><dd>${value}</dd></div>`;
+  const text = (label, value) => value ? `<div class="detail-tips"><strong>${escapeHtml(label)}</strong><p>${escapeHtml(value)}</p></div>` : "";
+  detailContent.innerHTML = `<dl class="facts">${[
+    fact(t("detail.cooker"), escapeHtml(cookerTypeLabel(entry.cookerType))),
+    fact(t("detail.wood"), escapeHtml(wood || t("misc.na"))),
+    fact(t("detail.time"), escapeHtml(time)),
+    fact(t("detail.temperature"), escapeHtml(formatTemperatureLong(entry, currentSettings.unit))),
+    fact(t("detail.result"), squares(entry.resultStars, true))
+  ].join("")}</dl>${text(t("detail.recipe"), entry.recipe)}${text(t("detail.tips"), entry.tips)}`;
   detailModal.classList.remove("hidden");
 }
 
@@ -554,20 +670,31 @@ function makeEntry(payload, existing = {}) {
   return entry;
 }
 
+function recommendTemperatureMode() {
+  if (entryForm.dataset.temperatureModeTouched === "true") return;
+  const recommended = entryForm.elements.namedItem("cookerType").value === "parrilla" ? "level" : "degrees";
+  setTemperatureMode(recommended, { auto: true });
+}
+
 function resetEntryForm() {
   entryForm.reset();
   delete entryForm.dataset.editingId;
   delete entryForm.dataset.temperatureModeTouched;
-  setTemperatureMode("degrees", { auto: true });
+  entryForm.elements.namedItem("smoked").value = "no";
+  syncSmokedButtons();
+  renderCookerOptions();
+  recommendTemperatureMode();
 }
 
 function populateFormForEdit(entry) {
   entryForm.elements.namedItem("meat").value = entry.meat || "";
   renderCookerOptions(entry.cookerType);
   entryForm.elements.namedItem("cookerType").value = entry.cookerType || "";
+  syncCookerButtons();
   entryForm.elements.namedItem("cookTimeAnverseMinutes").value = entry.cookTimeAnverseMinutes ?? "";
   entryForm.elements.namedItem("cookTimeReverseMinutes").value = entry.cookTimeReverseMinutes ?? "";
-  entryForm.elements.namedItem("smoked").value = entry.smoked || "no";
+  entryForm.elements.namedItem("smoked").value = entry.smoked === "yes" ? "yes" : "no";
+  syncSmokedButtons();
   entryForm.elements.namedItem("wood").value = entry.wood || "";
   entryForm.elements.namedItem("recipe").value = entry.recipe || "";
   entryForm.elements.namedItem("tips").value = entry.tips || "";
@@ -799,10 +926,24 @@ entryForm.querySelectorAll('.temp-block .mode-button[data-mode]').forEach((butto
   button.addEventListener("click", () => setTemperatureMode(button.dataset.mode));
 });
 
-entryForm.elements.namedItem("cookerType").addEventListener("change", (event) => {
-  if (entryForm.dataset.temperatureModeTouched === "true") return;
-  const recommended = event.target.value === "parrilla" ? "level" : "degrees";
-  setTemperatureMode(recommended, { auto: true });
+entryForm.elements.namedItem("cookerType").addEventListener("change", () => {
+  syncCookerButtons();
+  recommendTemperatureMode();
+});
+
+document.getElementById("cooker-buttons").addEventListener("click", (event) => {
+  const button = event.target.closest("[data-cooker]");
+  if (!button) return;
+  const select = entryForm.elements.namedItem("cookerType");
+  select.value = button.dataset.cooker;
+  select.dispatchEvent(new Event("change"));
+});
+
+document.querySelectorAll(".smoked-toggle .mode-button").forEach((button) => {
+  button.addEventListener("click", () => {
+    entryForm.elements.namedItem("smoked").value = button.dataset.smoked;
+    syncSmokedButtons();
+  });
 });
 
 document.querySelectorAll('.unit-toggle .mode-button[data-unit]').forEach((button) => {
@@ -823,6 +964,7 @@ document.querySelectorAll('.language-toggle .mode-button[data-lang]').forEach((b
     saveSettings(currentSettings);
     applyLanguageButtons();
     applyStaticTranslations();
+    applyCookerTypeCheckboxes();
     applyUnitSettingToForm();
     applyLevelTemps();
     renderEntries();
@@ -830,8 +972,10 @@ document.querySelectorAll('.language-toggle .mode-button[data-lang]').forEach((b
   });
 });
 
-document.querySelectorAll('.cooker-type-options input[name="enabledCookerTypes"]').forEach((checkbox) => {
-  checkbox.addEventListener("change", () => {
+document.getElementById("cooker-type-options").addEventListener("change", (event) => {
+  const checkbox = event.target;
+  if (!checkbox.matches('input[name="enabledCookerTypes"]')) return;
+  {
     const stillEnabled = COOKER_TYPES
       .filter((cooker) => document.getElementById(`cooker-type-${cooker.value}`)?.checked)
       .map((cooker) => cooker.value);
@@ -842,7 +986,7 @@ document.querySelectorAll('.cooker-type-options input[name="enabledCookerTypes"]
     currentSettings = { ...currentSettings, enabledCookerTypes: stillEnabled };
     saveSettings(currentSettings);
     renderEntries();
-  });
+  }
 });
 
 entryForm.addEventListener("submit", (event) => {
@@ -878,7 +1022,6 @@ entriesList.addEventListener("click", (event) => {
 });
 document.querySelectorAll(".nav-button").forEach((button) => button.addEventListener("click", () => showView(button.dataset.view)));
 document.getElementById("empty-add-button").addEventListener("click", () => showView("new-view"));
-document.getElementById("empty-mark-button").addEventListener("click", () => showView("new-view"));
 document.getElementById("close-modal").addEventListener("click", closeDetails);
 detailModal.addEventListener("click", (event) => { if (event.target === detailModal) closeDetails(); });
 document.getElementById("delete-button").addEventListener("click", () => {
@@ -963,11 +1106,9 @@ importInput.addEventListener("change", async (event) => {
     pendingImportEntries = imported;
     const { total, duplicateCount, newCount } = summarizeImport(loadEntries(), imported);
 
-    const newWord = t(newCount === 1 ? "import.newSingular" : "import.newPlural");
-    importSummary.textContent = duplicateCount > 0
-      ? tf("import.summaryWithDuplicates", { total, newCount, newWord, duplicateCount })
-      : tf("import.summaryAllNew", { total });
-    importMergeUseFileButton.classList.toggle("hidden", duplicateCount === 0);
+    const stat = (value, label) => `<div class="import-stat"><b>${value}</b><span>${escapeHtml(label)}</span></div>`;
+    importSummary.innerHTML = stat(total, t("import.statFile")) + stat(newCount, t("import.statNew")) + stat(duplicateCount, t("import.statExisting"));
+    document.getElementById("import-use-file-choice").classList.toggle("hidden", duplicateCount === 0);
     importMergeKeepMineButton.textContent = duplicateCount > 0 ? t("import.mergeKeepMine") : t("import.merge");
     importReview.classList.remove("hidden");
     hideSnackbar();
@@ -1015,4 +1156,6 @@ applyLanguageButtons();
 applyCookerTypeCheckboxes();
 applyLevelTemps();
 applyStaticTranslations();
+syncSmokedButtons();
 renderEntries();
+recommendTemperatureMode();

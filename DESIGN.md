@@ -203,3 +203,13 @@ Fixed by restructuring the header markup so the eyebrow is no longer inside the 
 Verified the same way as the original placement: rendered the real `mobile/index.html` + `mobile/styles.css` in headless Chromium at a 420px-wide viewport and inspected the crop — eyebrow now sits on its own line above the icon+title row, and the icon lines up with the title's vertical center.
 
 Synced to `www/` (Android/Capacitor build) immediately after.
+
+## Aicher / ERCO light direction (branch `aicher-redesign`)
+
+- Light only; no dark mode. Ground `#efefef`, ink `#0a0b0b`, hairlines `#9ba595`, faint rules `#d5d8d2`, muted `#61675e`.
+- One accent, Vlau-dark `#586a76`: selected states, filled result squares, active nav dash. Danger `#864036` outline only (delete, replace all).
+- Helvetica Neue bold/regular, flush-left, lowercase headings, 3px ink rule under the brand row, 1px hairlines, no radius, shadows or cards.
+- Result is five squares (not stars). Archive is pre-filtered to the first enabled cooker (alphabetical) with an "all cookers" option; the cooker is shown in a row only when viewing all.
+- New cook: up to 2 enabled cookers render as buttons, 3+ as a select. Smoked is a No/Yes toggle. Save bar is pinned above the nav.
+- Cook detail is a full-screen view with pinned edit/delete; "smoked" appears only for smoked cooks; hand-test temperature reads `High <5s · 220°C`.
+- Bottom nav: three equal cells, centered labels, 2px dash under the active label, "new cook" as a solid ink block.
