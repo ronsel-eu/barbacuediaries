@@ -29,7 +29,7 @@ In a nutshell: a piece of personal software that will probably only ever serve m
 
 ## What it does
 
-- Log a cook: meat, cooker, anverse and reverse time, temperature, smoked or not, wood, recipe, tips, and a 1-5 star result
+- Log a cook: meat, cooker, anverse and reverse time, temperature, smoked or not, wood, recipe, tips, and a 1-5 rating
 - Temperature as degrees **or** as a hand-test level (high / medium / medium-low / low), each shown with a reference temperature so you can cross-check against a thermometer
 - Archive of every cook, newest first, with search and filters
 - English and Spanish interface
@@ -59,7 +59,8 @@ In a nutshell: a piece of personal software that will probably only ever serve m
 - Vanilla HTML / CSS / JS in `mobile/`
 - Installable PWA (manifest + service worker), deployed to GitHub Pages by a GitHub Actions workflow on every push to `main`
 - [Capacitor](https://capacitorjs.com/) wraps the same code as a native Android app
-- Designed and built with AI assistance (Claude), directed and reviewed by me
+- Whole interface designed in Paper Pro
+- Built with AI assistance (Claude), directed and reviewed by me
 
 ## Run it locally
 
