@@ -190,7 +190,4 @@ The pictogram was added inline in the header beside the title (chosen over repla
 
 **Follow-up:** the mark was first centered against the whole brand block, including the stacked eyebrow line, so it read as sitting above the title's center. Fixed by restructuring the markup so the eyebrow sits above, and a separate flex row contains only the mark and the `<h1>`, with `align-items: center`. Verified by rendering the real files in headless Chromium at a 420px viewport.
 
-## Open questions (as of the first redesign pass)
 
-- Do you own licensed files for Univers and/or Frutiger, or should those stay long-term mood reference?
-- Now that Vlau's real value is a cooler blue-grey (not the more violet tone the text research suggested), does the restrained direction still feel right on the phone, or does it read as too cool or technical for a personal cook journal?
