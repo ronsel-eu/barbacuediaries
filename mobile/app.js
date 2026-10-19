@@ -60,7 +60,7 @@ const TRANSLATIONS = {
     "archive.eyebrow": "Your fire history",
     "archive.title": "Archive",
     "archive.searchLabel": "Search",
-    "archive.searchPlaceholder": "Meat or wood",
+    "archive.searchPlaceholder": "Meat or recipe",
     "archive.filterAriaLabel": "Filter by cooker",
     "archive.filterAll": "All cookers",
     "archive.emptyAddAria": "Add first cook",
@@ -189,7 +189,7 @@ const TRANSLATIONS = {
     "archive.eyebrow": "Tu historial de fuego",
     "archive.title": "Archivo",
     "archive.searchLabel": "Buscar",
-    "archive.searchPlaceholder": "Carne o leña",
+    "archive.searchPlaceholder": "Carne o receta",
     "archive.filterAriaLabel": "Filtrar por método",
     "archive.filterAll": "Todos los tipos",
     "archive.emptyAddAria": "Añadir primer asado",
@@ -640,7 +640,7 @@ function getFilteredEntries() {
   const query = String(filters.query || "").trim().toLowerCase();
   return loadEntries()
     .filter((entry) => {
-      const searchable = `${entry.meat} ${entry.wood} ${entry.cookerType} ${cookerTypeLabel(entry.cookerType)}`.toLowerCase();
+      const searchable = `${entry.meat} ${entry.recipe || ""} ${entry.cookerType} ${cookerTypeLabel(entry.cookerType)}`.toLowerCase();
       return (!query || searchable.includes(query)) && (!filters.cookerType || entry.cookerType === filters.cookerType);
     })
     .sort((first, second) => new Date(second.createdAt) - new Date(first.createdAt));
