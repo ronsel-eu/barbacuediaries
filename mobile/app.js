@@ -91,7 +91,7 @@ const TRANSLATIONS = {
     "form.smokedNo": "No",
     "form.smokedYes": "Yes",
     "form.woodLabel": "Wood",
-    "form.woodPlaceholder": "e.g. Encina",
+    "form.woodPlaceholder": "e.g. Holm oak",
     "form.finalResultLegend": "Final result",
     "form.starRatingAriaLabel": "Final result rating",
     "star.title5": "5 stars",
